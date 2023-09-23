@@ -1,3 +1,9 @@
+<style>
+    #div_books img {
+        cursor: pointer;
+    }
+</style>
+
 <div class="row my-5">
     <div class="col">
         <!--검색폼-->
@@ -19,13 +25,14 @@
         </div>
     </div>
 </div>
+
 <!--도서검색 템플릿-->
 <script type="x-handlebars-template" id="temp_books">
     {{#each documents}}
         <div class="col-6 col-md-4 col-lg-2 mb-3">
             <div class="card">
                 <div class="card-body">
-                    <img src="{{check thumbnail}}" width="90%">
+                    <img src="{{check thumbnail}}" width="90%" index="{{@index}}">
                     <div class="ellipsis" style="font-size:0.8rem";>
                         {{title}}
                     </div>
@@ -33,6 +40,7 @@
                 <div class="card-footer" style="font-size:0.8rem";>{{format price}}</div>
             </div>
         </div>
+        <%-include('books/modal.ejs')%>
     {{/each}} <!--반복문 문법-->
 </script>
 
@@ -55,6 +63,12 @@
     let query=$(frm.query).val();
     let page=1;
     getBooks();
+
+    // 이미지를 클릭한 경우
+    $("#div_books").on("click", "img", function(){
+        let index = $(this).attr("index");
+        $("#modal" + index).modal("show");
+    });
     $(frm).on("submit", function(e){
         e.preventDefault();
         query=$(frm.query).val();
@@ -82,7 +96,7 @@
             data: {query: query, page: page, size: 6},
             success: function(result){
                console.log(result);
-               let temp=Handlebars.compile($("#temp_books").html());
+               let temp = Handlebars.compile($("#temp_books").html());
                $("#div_books").html(temp(result));
                let last = Math.ceil(result.meta.pageable_count/6);
                $("#span_page").html(page + "/" + last);
