@@ -2,6 +2,11 @@
     #div_books img {
         cursor: pointer;
     }
+    #div_books .bi{
+        cursor: pointer;
+        color: green;
+        font-size: 1.5rem;
+    }
 </style>
 
 <div class="row my-5">
@@ -37,7 +42,11 @@
                         {{title}}
                     </div>
                 </div>
-                <div class="card-footer" style="font-size:0.8rem";>{{format price}}</div>
+                <div class="card-footer" style="font-size:0.8rem";>
+                    {{format price}}
+                    <i class="bi bi-cart4 float-end" book="{{book @this}}"></i> <!-- this : object 값 저장되어있음 -->
+                </div>
+
             </div>
         </div>
         <%-include('books/modal.ejs')%>
@@ -57,12 +66,27 @@
         if(price) return price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',') + '원';
     });
 
+    Handlebars.registerHelper("book", function(book){
+        return JSON.stringify(book); // object => String
+    })
+
 </script>
 
 <script>
     let query=$(frm.query).val();
     let page=1;
     getBooks();
+
+    // 장바구니를 클릭한 경우
+    $("#div_books").on("click", ".bi", function(){
+       if(!sessionStorage.getItem("email")){
+           location.href="/users/login";
+       }else{
+           // 장바구니에 등록
+           const book=JSON.parse($(this).attr("book")); // string -> object
+           console.log(book);
+       }
+    });
 
     // 이미지를 클릭한 경우
     $("#div_books").on("click", "img", function(){
